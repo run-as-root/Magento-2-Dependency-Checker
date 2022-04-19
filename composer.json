@@ -1,0 +1,19 @@
+{
+    "name": "run_as_root/integrity-checker",
+    "type": "project",
+    "version": "1.0.1",
+    "bin": [
+        "bin/dependencies",
+        "bin/structure"
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "ext-json": "*",
+        "ext-simplexml": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "RunAsRoot\\IntegrityChecker\\": "src"
+        }
+    }
+}

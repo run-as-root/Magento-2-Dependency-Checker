@@ -1,0 +1,35 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+use RunAsRoot\IntegrityChecker\Analysis\Enum\DefaultAnalysisFolders;
+use RunAsRoot\IntegrityChecker\Analysis\Service\Dependencies;
+use RunAsRoot\IntegrityChecker\Analysis\Data\ResultInterface;
+use RunAsRoot\IntegrityChecker\Application\Dependencies\Console;
+use RunAsRoot\IntegrityChecker\Domain\Scanner\PackagesProvider;
+
+require_once __DIR__ . '/../bootstrap.php';
+
+$console = new Console();
+
+if (!$console->validateParameters()) {
+    $console->printHelp();
+    die(2);
+}
+
+$directories = array_slice($argv, 2);
+
+if (empty($directories)) {
+    $directories = [DefaultAnalysisFolders::APP, DefaultAnalysisFolders::SRC];
+}
+
+$scanner = new PackagesProvider();
+$packages = $scanner->getPackages($directories);
+
+$analyzer = new Dependencies();
+
+/** @var ResultInterface $result */
+foreach ($analyzer->analyse($packages) as $result) {
+    $console->printOutput($result);
+}
+
+exit($console->getStatusCode());

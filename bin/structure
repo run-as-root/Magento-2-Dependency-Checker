@@ -1,0 +1,40 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+use RunAsRoot\IntegrityChecker\Analysis\Data\ResultInterface;
+use RunAsRoot\IntegrityChecker\Analysis\Enum\DefaultAnalysisFolders;
+use RunAsRoot\IntegrityChecker\Analysis\Enum\DefaultPackageStructure;
+use RunAsRoot\IntegrityChecker\Analysis\Service\Structure;
+use RunAsRoot\IntegrityChecker\Application\Structure\Console;
+use RunAsRoot\IntegrityChecker\Domain\Scanner\PackagesProvider;
+
+require_once __DIR__ . '/../bootstrap.php';
+
+$console = new Console();
+
+if (!$console->validateParameters()) {
+    $console->printHelp();
+    die(2);
+}
+
+$directories = array_slice($argv, 2);
+
+if (empty($directories)) {
+    $directories = [DefaultAnalysisFolders::APP, DefaultAnalysisFolders::SRC];
+}
+
+$analyzer = new Structure(DefaultPackageStructure::STRUCTURE);
+$scanner = new PackagesProvider();
+
+$filter = function (SplFileInfo $fileInfo) {
+    return (bool)preg_match('/ComponentRegistrar::MODULE/', php_strip_whitespace($fileInfo->getPathname()));
+};
+
+$packages = $scanner->getPackages($directories, $filter, '/registration\\.php/');
+
+/** @var ResultInterface $result */
+foreach ($analyzer->analyse($packages) as $result) {
+    $console->printOutput($result);
+}
+
+exit($console->getStatusCode());
