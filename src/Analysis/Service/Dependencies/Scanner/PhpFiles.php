@@ -7,7 +7,16 @@ use RunAsRoot\IntegrityChecker\Domain\Package;
 
 class PhpFiles implements DependenciesScannerInterface
 {
-    private const FILE_MASKS = ['php', 'phtml'];
+    private const FILE_MASKS = ['php', 'phtml', 'xml', 'js'];
+    private const SKIP_FILES = [
+        'module.xml',
+        'db_schema.xml',
+        'config.xml',
+        'sections.xml',
+        'page_types.xml',
+        'fieldset.xml',
+        'csp_whitelist.xml'
+    ];
 
     private string $regexp;
 
@@ -69,6 +78,9 @@ class PhpFiles implements DependenciesScannerInterface
      */
     private function analyzeFile(\SplFileInfo $file, array $currentModuleNamespaces): array
     {
+        if (in_array($file->getFilename(), self::SKIP_FILES)) {
+            return [];
+        }
         $contents = \php_strip_whitespace($file->getPathname());
 
         if ($file->getExtension() === 'phtml') {
@@ -91,7 +103,7 @@ class PhpFiles implements DependenciesScannerInterface
             $dependenciesInfo[] = $referenceModule;
         }
 
-        return $dependenciesInfo;
+        return array_unique($dependenciesInfo);
     }
 
     /**
@@ -105,8 +117,7 @@ class PhpFiles implements DependenciesScannerInterface
     {
         return (string)preg_replace_callback(
             '~(<\?(php|=)\s+.*\?>)~sU',
-            function (array $matches) use ($contents, &$contentsWithoutHtml)
-            {
+            function (array $matches) use ($contents, &$contentsWithoutHtml) {
                 $contentsWithoutHtml .= $matches[1];
 
                 return $contents;

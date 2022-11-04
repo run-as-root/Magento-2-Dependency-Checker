@@ -4,10 +4,10 @@ Package allows to run static analysis on Magento 2 Module Packages to provide an
 
 ### Supported tools: ###
 
-- **Composer.json package dependencies checker** - check *.php and *.phtml on a subject if other packages used inside
+- **Composer.json package dependencies checker** - check *.xml, *.js, *.php and *.phtml on a subject if other packages used inside
   and check if corresponding module/package is declared as required in composer.json.
 - **Module.xml dependencies checker** - analyse if packages' etc/module.xml file contains in 'sequence' section all
-  Magento 2 modules which classes are used in *.php and *.phtml files of the package.
+  Magento 2 modules which classes are used in *.xml, *.js, *.php and *.phtml files of the package.
 - **Package structure checker** - verify if all newly added Magento 2 modules has a proper structure with all required
   files.
 
