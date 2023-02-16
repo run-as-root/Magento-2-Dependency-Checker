@@ -75,7 +75,8 @@ class ModuleXml
         $this->content['module']['sequence'] = [];
 
         foreach ($content->module->sequence->children() as $module) {
-            $this->content['module']['sequence'][] = (string)current(current($module->attributes()));
+            $moduleName = get_mangled_object_vars($module->attributes())['@attributes']['name'];
+            $this->content['module']['sequence'][] = $moduleName;
         }
     }
 }
