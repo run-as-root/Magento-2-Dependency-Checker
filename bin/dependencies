@@ -16,14 +16,20 @@ if (!$console->validateParameters()) {
     die(2);
 }
 
-$directories = array_slice($argv, 2);
+// Filter out --ai-prompts, --v2, and --no-legacy flags from directory arguments
+$directories = array_filter($argv, function($arg) {
+    return !in_array($arg, ['--ai-prompts', '--v2', '--no-legacy']);
+});
+$directories = array_values($directories); // Re-index
 
-if (empty($directories)) {
-    $directories = [DefaultAnalysisFolders::APP, DefaultAnalysisFolders::SRC];
+$directoriesToScan = array_slice($directories, 2);
+
+if (empty($directoriesToScan)) {
+    $directoriesToScan = [DefaultAnalysisFolders::APP, DefaultAnalysisFolders::SRC];
 }
 
 $scanner = new PackagesProvider();
-$packages = $scanner->getPackages($directories);
+$packages = $scanner->getPackages($directoriesToScan);
 
 $analyzer = new Dependencies();
 

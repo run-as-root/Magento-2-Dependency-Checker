@@ -1,0 +1,33 @@
+---
+name: PHP Matrix Test
+
+on:
+  push:
+    branches: [main, feature/*]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: [8.2 8.3 8.4]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl
+          coverage: none
+      - name: Install dependencies
+        run: |
+          rm composer.lock && composer install --no-interaction --prefer-dist
+      - name: Run tests
+        run: |
+          if [ -f vendor/bin/phpunit ]; then
+            vendor/bin/phpunit
+          else
+            echo "No tests found. Skipping."
+          fi

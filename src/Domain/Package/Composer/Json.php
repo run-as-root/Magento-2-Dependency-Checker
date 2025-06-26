@@ -67,10 +67,12 @@ class Json
         $dependencies = $this->getContent()['require'] ?? [];
         $dependencies = array_keys($dependencies);
 
-        return array_filter($dependencies, function (string $dependency): bool
+        $filtered = array_filter($dependencies, function (string $dependency): bool
         {
             return strpos($dependency, '/') !== false;
         });
+        
+        return array_values($filtered);
     }
 
     /**

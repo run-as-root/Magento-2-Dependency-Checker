@@ -1,12 +1,13 @@
 {
     "name": "run_as_root/integrity-checker",
+    "description": "Integrity checker for Composer based projects",
     "type": "project",
     "bin": [
         "bin/dependencies",
         "bin/structure"
     ],
     "require": {
-        "php": ">=7.2.0",
+        "php": ">=8.2",
         "ext-json": "*",
         "ext-simplexml": "*"
     },
@@ -14,5 +15,16 @@
         "psr-4": {
             "RunAsRoot\\IntegrityChecker\\": "src"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "RunAsRoot\\IntegrityChecker\\Tests\\": "tests/Unit/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
     }
 }
