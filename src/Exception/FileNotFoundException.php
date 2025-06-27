@@ -8,7 +8,7 @@ class FileNotFoundException extends \Exception
 {
     private const MESSAGE_PATTERN = 'File was not found: %s in package %s.';
 
-    public function __construct(string $file, string $package, $message = "", $code = 0, Throwable $previous = null)
+    public function __construct(string $file, string $package, $message = "", $code = 0, ?Throwable $previous = null)
     {
         if (empty($message)) {
             $message = sprintf(self::MESSAGE_PATTERN, $file, $package);

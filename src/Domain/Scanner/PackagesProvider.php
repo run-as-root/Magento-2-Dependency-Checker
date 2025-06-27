@@ -19,7 +19,7 @@ class PackagesProvider
     {
         $collectedPaths = [];
         foreach ($paths as $path) {
-            $collectedPaths[] = $this->getMatchedFilesFolders(ROOT_DIR . $path, $fileMask, $filter);
+            $collectedPaths[] = $this->getMatchedFilesFolders(ROOT_DIR . DIRECTORY_SEPARATOR . $path, $fileMask, $filter);
         }
 
         $uniquePackages = array_unique(array_merge([], ...$collectedPaths));

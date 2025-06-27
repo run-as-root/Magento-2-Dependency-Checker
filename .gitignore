@@ -1,2 +1,4 @@
 .idea
 vendor
+coverage
+.phpunit.cache

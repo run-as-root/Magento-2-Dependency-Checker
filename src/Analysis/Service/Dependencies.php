@@ -59,6 +59,7 @@ class Dependencies implements AnalyzerInterface
     {
         return new Result(
             $package->getPackageName(),
+            $package->getPackagePath(),
             $this->compareComposerDependencies($package, $dependencies),
             $this->compareModuleXmlDependencies($package, $dependencies)
         );
