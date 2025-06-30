@@ -23,7 +23,7 @@ jobs:
           coverage: none
       - name: Install dependencies
         run: |
-          rm composer.lock && composer install --no-interaction --prefer-dist
+          composer install --no-interaction --prefer-dist
       - name: Run tests
         run: |
           if [ -f vendor/bin/phpunit ]; then
