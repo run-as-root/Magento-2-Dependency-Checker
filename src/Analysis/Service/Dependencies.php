@@ -122,6 +122,14 @@ class Dependencies implements AnalyzerInterface
             $composerDeps = [];
         }
 
-        return array_diff($dependenciesPackages, $composerDeps);
+        $missing = array_filter(
+            $dependenciesPackages,
+            fn(string $packageName) => !array_intersect(
+                $this->packagesRegistry->getPackageAliases($packageName),
+                $composerDeps
+            )
+        );
+
+        return array_values(array_unique($missing));
     }
 }
