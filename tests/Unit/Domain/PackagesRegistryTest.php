@@ -293,6 +293,63 @@ class PackagesRegistryTest extends TestCase
     /**
      * Helper method to reset the singleton instance
      */
+    public function testMostSpecificNamespacePrefixWins(): void
+    {
+        $registry = $this->createRegistry([
+            $this->lockPackage('vendor/broad', ['Magento\\' => 'src/']),
+            $this->lockPackage('mage-os/framework', ['Magento\\Framework\\' => '']),
+        ]);
+
+        $this->assertSame('mage-os/framework', $registry->getPackageNameByNamespace('Magento\\Framework'));
+        $this->assertSame('vendor/broad', $registry->getPackageNameByNamespace('Magento\\Other'));
+    }
+
+    public function testNamespacesMappedToGeneratedCodeAreIgnored(): void
+    {
+        $registry = $this->createRegistry([
+            $this->lockPackage('schrammel-codes/magento2-epc-qr-code', [
+                'SchrammelCodes\\EpcQrCode\\' => '',
+                'Magento\\' => 'generated/code/Magento/',
+            ]),
+        ]);
+
+        $this->assertNull($registry->getPackageNameByNamespace('Magento\\GiftCard'));
+        $this->assertSame(
+            'schrammel-codes/magento2-epc-qr-code',
+            $registry->getPackageNameByNamespace('SchrammelCodes\\EpcQrCode')
+        );
+    }
+
+    public function testPackageAliasesIncludeReplacedAndProvidedPackages(): void
+    {
+        $registry = $this->createRegistry([
+            $this->lockPackage('mage-os/framework', ['Magento\\Framework\\' => ''], [
+                'replace' => ['magento/framework' => '103.0.9'],
+                'provide' => ['psr/log-implementation' => '1.0'],
+            ]),
+        ]);
+
+        $this->assertSame(
+            ['mage-os/framework', 'magento/framework', 'psr/log-implementation'],
+            $registry->getPackageAliases('mage-os/framework')
+        );
+        $this->assertSame(['unknown/package'], $registry->getPackageAliases('unknown/package'));
+    }
+
+    private function createRegistry(array $packages): PackagesRegistry
+    {
+        $reflection = new ReflectionClass(PackagesRegistry::class);
+        $registry = $reflection->newInstanceWithoutConstructor();
+        $reflection->getMethod('registerPackages')->invoke($registry, $packages);
+
+        return $registry;
+    }
+
+    private function lockPackage(string $name, array $psr4, array $extra = []): array
+    {
+        return ['name' => $name, 'type' => 'library', 'autoload' => ['psr-4' => $psr4]] + $extra;
+    }
+
     private function resetSingleton(): void
     {
         $reflection = new ReflectionClass(PackagesRegistry::class);

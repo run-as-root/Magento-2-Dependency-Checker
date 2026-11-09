@@ -246,6 +246,31 @@ class DependenciesTest extends TestCase
         $this->assertContains('vendor/also-used', $result);
     }
 
+    public function testCompareComposerDependenciesAcceptsReplacedPackageNames(): void
+    {
+        $mockPackage = $this->createMock(Package::class);
+        $mockPackage->method('getComposerDependencies')->willReturn(['magento/framework']);
+
+        $this->mockPackagesRegistry->method('getPackageNameByNamespace')
+            ->willReturnMap([
+                ['Magento\\Framework', 'mage-os/framework'],
+                ['Magento\\Store', 'mage-os/module-store'],
+                ['Magento\\Store\\Model', 'mage-os/module-store'],
+            ]);
+        $this->mockPackagesRegistry->method('getPackageAliases')
+            ->willReturnMap([
+                ['mage-os/framework', ['mage-os/framework', 'magento/framework']],
+                ['mage-os/module-store', ['mage-os/module-store', 'magento/module-store']],
+            ]);
+
+        $result = $this->callPrivateMethod(
+            'compareComposerDependencies',
+            [$mockPackage, ['Magento\\Framework', 'Magento\\Store', 'Magento\\Store\\Model']]
+        );
+
+        $this->assertSame(['mage-os/module-store'], $result);
+    }
+
     /**
      * Helper method to call private methods for testing
      */
